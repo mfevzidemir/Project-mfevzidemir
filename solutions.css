@@ -1,0 +1,318 @@
+/* solutions.css – MFevziDemir Ek Stiller */
+/* Bu dosya main.css ile birlikte çalışır, özel override'lar içerir */
+
+/* ---------- Navbar Toggler ---------- */
+.navbar-toggler {
+    border: none !important;
+    padding: 8px;
+    border-radius: 8px;
+    transition: var(--transition-smooth);
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(14, 62, 76, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* ---------- Typed Cursor Effect ---------- */
+.typed-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1.1em;
+    background: var(--accent-primary);
+    margin-left: 4px;
+    vertical-align: text-bottom;
+    animation: blink-cursor 0.75s step-end infinite;
+}
+
+@keyframes blink-cursor {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ---------- Floating Labels ---------- */
+.floating-label-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.floating-label-group input:focus+label,
+.floating-label-group input:not(:placeholder-shown)+label {
+    top: -10px;
+    font-size: 0.75rem;
+    color: var(--accent-primary);
+    background: #fff;
+    padding: 0 6px;
+}
+
+/* ---------- Testimonials / Trust ---------- */
+.trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    box-shadow: var(--shadow-sm);
+}
+
+.trust-badge i {
+    color: var(--accent-primary);
+}
+
+/* ---------- Counter Animation ---------- */
+.counter-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---------- Card Shimmer Effect ---------- */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.glass-card.shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* ---------- Gradient Text Underline ---------- */
+.gradient-underline {
+    position: relative;
+    display: inline-block;
+}
+
+.gradient-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-gradient);
+    border-radius: 3px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gradient-underline:hover::after {
+    transform: scaleX(1);
+}
+
+/* ---------- Icon Floating Animation ---------- */
+@keyframes icon-float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.float-icon {
+    animation: icon-float 3s ease-in-out infinite;
+}
+
+/* ---------- Glow Ring Effect ---------- */
+.glow-ring {
+    position: relative;
+}
+
+.glow-ring::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: var(--accent-gradient);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.glow-ring:hover::before {
+    opacity: 0.6;
+    filter: blur(8px);
+}
+
+/* ---------- Tooltip Styles ---------- */
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    padding: 6px 14px;
+    background: var(--accent-navy);
+    color: var(--text-white);
+    font-size: 0.78rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition-smooth);
+}
+
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- Alert Overrides ---------- */
+.alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    color: #155724;
+    border-radius: var(--radius-sm);
+}
+
+.alert-danger {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #721c24;
+    border-radius: var(--radius-sm);
+}
+
+/* ---------- Portfolio Enhancements ---------- */
+.portfolio-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--accent-gradient);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: var(--radius-pill);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+    box-shadow: var(--shadow-sm);
+}
+
+.portfolio-content {
+    transition: var(--transition-smooth);
+}
+
+.glass-card:hover .portfolio-content {
+    padding-bottom: 2.5rem !important;
+    background: linear-gradient(transparent, #fff 90%) !important;
+}
+
+/* ---------- Process Section ---------- */
+.process-step {
+    width: 60px;
+    height: 60px;
+    background: var(--accent-gradient);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-weight: 700;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-glow);
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- FAQ Accordion ---------- */
+.accordion .btn-link {
+    color: var(--accent-navy);
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    transition: var(--transition-smooth);
+}
+
+.accordion .btn-link i,
+.accordion .btn-link .bi {
+    transition: transform 0.3s ease;
+}
+
+.accordion .btn-link:not(.collapsed) i,
+.accordion .btn-link:not(.collapsed) .bi {
+    transform: rotate(90deg);
+    color: var(--accent-primary);
+}
+
+.accordion .card-body {
+    border-top: 1px solid rgba(0,0,0,0.03);
+}
+
+/* ---------- Testimonials ---------- */
+.italic {
+    font-style: italic;
+}
+
+/* ---------- Blog Cards ---------- */
+#blog .glass-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#blog .glass-card:hover {
+    transform: translateY(-10px);
+}
+
+/* ---------- Accessibility: Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .animate-up {
+        opacity: 1;
+        transform: none;
+    }
+
+    .whatsapp-float {
+        animation: none;
+    }
+}

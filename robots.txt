@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /customer/
+Disallow: /private/
+Disallow: /admin/
+
+# Sitemap Link
+Sitemap: https://mfevzidemir.com/sitemap.xml
