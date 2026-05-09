@@ -166,6 +166,16 @@
             box-shadow: 0 0 0 0.2rem rgba(48, 166, 205, 0.25) !important;
             border-color: #30A6CD !important;
         }
+
+        /* Toast Animation */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-slide-in {
+            animation: slideInRight 0.5s ease forwards;
+        }
     </style>
 </head>
 
@@ -279,10 +289,17 @@
                     <div class="col-lg-6 mb-4">
                         <div class="glass-card p-4 h-100">
                             <h5><i class="fa-solid fa-user-shield mr-2 text-primary"></i> Şifre ve Güvenlik</h5>
-                            <div class="form-group mt-3">
+                             <div class="form-group mt-3">
                                 <label class="small font-weight-bold text-muted">E-Posta Adresi</label>
                                 <input type="email" id="updateEmailInput" class="form-control-mf" placeholder="yeni@eposta.com">
                                 <button class="btn btn-outline-mf btn-sm mt-2 w-100" id="saveEmailBtn">E-Postayı Güncelle</button>
+                            </div>
+
+                            <div class="mt-3 d-none" id="settingsVerifySection">
+                                <div class="alert alert-warning py-2 px-3 small border-0 d-flex align-items-center justify-content-between" style="background: rgba(255, 193, 7, 0.1); border-radius: 10px;">
+                                    <span style="color: #856404;"><i class="fa-solid fa-envelope-circle-check mr-2"></i> Mail adresiniz onaylanmamış.</span>
+                                    <button class="btn btn-warning btn-sm py-1 px-3 font-weight-bold text-dark" id="resendVerifyBtnSettings" style="font-size: 11px; border-radius: 8px; border: none; background: #ffc107;">Doğrula</button>
+                                </div>
                             </div>
 
                             <hr class="border-secondary opacity-10 my-4">
@@ -578,6 +595,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, updatePassword, sendEmailVerification, updateEmail, verifyBeforeUpdateEmail } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js";
         import {
             getFirestore,
             doc,
@@ -605,6 +623,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const functions = getFunctions(app);
 
         const userDisplayName = document.getElementById('userDisplayName');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -656,11 +675,16 @@
                     loadChatHistory(user.email);
                 }
 
-                // Email Verification Banner
+                // Email Verification Banner & Settings Prompt
+                const verifyEmailBanner = document.getElementById('verifyEmailBanner');
+                const settingsVerifySection = document.getElementById('settingsVerifySection');
+                
                 if (!user.emailVerified) {
-                    verifyEmailBanner.classList.remove('d-none');
+                    if(verifyEmailBanner) verifyEmailBanner.classList.remove('d-none');
+                    if(settingsVerifySection) settingsVerifySection.classList.remove('d-none');
                 } else {
-                    verifyEmailBanner.classList.add('d-none');
+                    if(verifyEmailBanner) verifyEmailBanner.classList.add('d-none');
+                    if(settingsVerifySection) settingsVerifySection.classList.add('d-none');
                 }
 
                 // Fetch profile & 2FA Status
@@ -921,15 +945,18 @@
         // Toast System
         const showToast = (msg, type = 'primary') => {
             const toast = document.createElement('div');
-            toast.className = `glass-card p-3 mb-2 animate-up shadow-lg border-0 text-white bg-${type === 'danger' ? 'danger' : 'primary'}`;
-            toast.style.minWidth = '250px';
+            toast.className = `glass-card p-3 mb-2 toast-slide-in shadow-lg border-0 text-white bg-${type === 'danger' ? 'danger' : 'primary'}`;
+            toast.style.minWidth = '280px';
             toast.style.background = type === 'danger' ? 'rgba(220, 53, 69, 0.95)' : 'rgba(48, 166, 205, 0.95)';
+            toast.style.borderRadius = '12px';
             toast.innerHTML = `<div class="d-flex align-items-center"><i class="fa-solid fa-${type === 'danger' ? 'circle-exclamation' : 'circle-check'} mr-2"></i> ${msg}</div>`;
             document.getElementById('toastContainer').appendChild(toast);
             setTimeout(() => {
+                toast.style.transition = '0.5s';
                 toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
                 setTimeout(() => toast.remove(), 500);
-            }, 3000);
+            }, 4000); // 4 saniye
         };
 
         // 2FA Verification Logic
@@ -1033,8 +1060,8 @@
         const settingsBtn = document.getElementById('settingsBtn');
         const backToDashboard = document.getElementById('backToDashboard');
         const settingsView = document.getElementById('settingsView');
-        const verifyEmailBanner = document.getElementById('verifyEmailBanner');
         const resendVerifyBtn = document.getElementById('resendVerifyBtn');
+        const resendVerifyBtnSettings = document.getElementById('resendVerifyBtnSettings');
 
         settingsBtn.onclick = () => {
             customerView.classList.add('d-none');
@@ -1051,15 +1078,29 @@
             }
         };
 
-        // Email Verification Logic
-        resendVerifyBtn.onclick = async () => {
+        // Email Verification Logic (Unified & Professional)
+        const handleResendVerification = async () => {
             try {
-                await sendEmailVerification(auth.currentUser);
-                showToast('Doğrulama e-postası tekrar gönderildi. Lütfen kutunuzu kontrol edin.', 'success');
+                // Kurumsal HTML Mail tetikleyici (Cloud Function)
+                const sendCustomEmail = httpsCallable(functions, 'sendCustomVerificationEmail');
+                showToast('İşlem başlatılıyor...', 'info');
+                
+                await sendCustomEmail({ name: userData?.name || 'Değerli Kullanıcımız' });
+                showToast('Kurumsal e-posta doğrulamanız gönderilmiştir.', 'success');
             } catch (e) {
-                showToast('Hata: E-posta gönderilemedi.', 'danger');
+                console.error("Verification Error:", e);
+                // Eğer Cloud Function henüz yüklü değilse fallback olarak standart maili gönder
+                try {
+                    await sendEmailVerification(auth.currentUser);
+                    showToast('E-posta doğrulamanız gönderilmiştir.', 'success');
+                } catch (fallbackError) {
+                    showToast('Hata: E-posta gönderilemedi.', 'danger');
+                }
             }
         };
+
+        if(resendVerifyBtn) resendVerifyBtn.onclick = handleResendVerification;
+        if(resendVerifyBtnSettings) resendVerifyBtnSettings.onclick = handleResendVerification;
 
         // Password Strength Checker
         const newPasswordInput = document.getElementById('newPassword');
